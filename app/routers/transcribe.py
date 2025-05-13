@@ -43,38 +43,47 @@ async def transcribe(payload: Base64AudioInput):
 
         logger.info(f"Transcription started!")
         model = WhisperSingleton.get_model()
+        socket_group_id = get_socket_group_name("whisper", payload.socket_session_id)
 
         try:
-            segments, info = model.transcribe(audio_stream)
+            segments, info = model.transcribe(
+                audio_stream,
+                vad_filter=True,  # Important for segmenting audio
+                chunk_length=15,  # Process in 15-second chunks
+                language=None,  # Optional: or specify "en", etc.
+                task="transcribe",
+                log_progress=True,  # Optional: logs segment processing
+            )
         except Exception as e:
             logger.error(f"Error during transcription: {str(e)}")
             raise HTTPException(
                 status_code=500, detail=f"Transcription error: {str(e)}"
             )
 
-        logger.debug(
-            f"[Whisper] Detected language: {info.language} ({info.language_probability:.2f})"
-        )
-
-        socket_group_id = get_socket_group_name(
-            "whisper", payload.socket_session_id
-        )
-
         transcript = []
-        for segment in segments:
-            global_start = payload.start_offset + segment.start
-            global_end = payload.start_offset + segment.end
-            await send_log_message_async(
-                message=f"{global_start:.2f}s -> {global_end:.2f}s: {segment.text}",
-                group_id=socket_group_id,
-                module="whisper_api",
-                scope="whisper",
-            )
-            transcript.append(segment.text)
 
-        transcription = " ".join(transcript)
-        logger.info(f"Transcription completed successfully!")
-        logger.debug(f"Transcription result: {transcription}")
+        try:
+            for segment in segments:
+                global_start = payload.start_offset + segment.start
+                global_end = payload.start_offset + segment.end
+
+                # Send each segment log
+                await send_log_message_async(
+                    message=f"{global_start:.2f}s -> {global_end:.2f}s: {segment.text}",
+                    group_id=socket_group_id,
+                    module="whisper_api",
+                    scope="whisper",
+                )
+
+                transcript.append(segment.text)
+
+            transcription = " ".join(transcript)
+            logger.info("Transcription completed successfully!")
+            logger.debug(f"Transcription result: {transcription}")
+
+        except Exception as e:
+            logger.error(f"Error during streaming transcription: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Streaming error: {str(e)}")
 
         return {"transcription": transcription}
     except Exception as e:
