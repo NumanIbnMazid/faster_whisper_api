@@ -20,13 +20,13 @@ class WhisperSingleton:
                     settings.MODEL_SIZE, device=settings.DEVICE
                 )
                 logger.info(
-                    "✅ [WhisperSingleton] Model loaded successfully. Model: {settings.MODEL_SIZE} on {settings.DEVICE}"
+                    f"✅ [WhisperSingleton] Model loaded successfully. Model: {settings.MODEL_SIZE} on {settings.DEVICE}"
                 )
             except Exception as e:
                 logger.error(f"🚫 [WhisperSingleton] Failed to load model: {e}")
                 raise
         else:
             logger.info(
-                "🟢 [WhisperSingleton] Returning existing model instance. Model: {settings.MODEL_SIZE} on {settings.DEVICE}"
+                f"🟢 [WhisperSingleton] Returning existing model instance. Model: {settings.MODEL_SIZE} on {settings.DEVICE}"
             )
         return cls._model_instance
