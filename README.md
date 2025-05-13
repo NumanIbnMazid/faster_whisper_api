@@ -1,6 +1,6 @@
 ---
 title: Faster Whisper API
-emoji: {{emoji}}
+emoji: 🚀
 colorFrom: indigo
 colorTo: purple
 sdk: docker
