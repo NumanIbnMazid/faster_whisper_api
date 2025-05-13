@@ -49,10 +49,7 @@ async def transcribe(payload: Base64AudioInput):
             segments, info = model.transcribe(
                 audio_stream,
                 vad_filter=True,  # Important for segmenting audio
-                chunk_length=15,  # Process in 15-second chunks
-                language=None,  # Optional: or specify "en", etc.
-                task="transcribe",
-                log_progress=True,  # Optional: logs segment processing
+                # chunk_length=15,  # Process in 15-second chunks
             )
         except Exception as e:
             logger.error(f"Error during transcription: {str(e)}")
