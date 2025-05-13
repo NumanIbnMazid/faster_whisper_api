@@ -1,0 +1,10 @@
+services:
+  whisper-api:
+    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: whisper-api
+    ports:
+      - "7860:7860"
+    restart: unless-stopped
