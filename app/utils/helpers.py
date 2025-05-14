@@ -1,5 +1,5 @@
 import json
-from app.routers.websocket import groups  # Adjust import if needed
+from app.routers.websocket import groups
 import uuid
 
 async def send_log_message_async(

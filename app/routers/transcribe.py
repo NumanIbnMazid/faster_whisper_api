@@ -51,15 +51,13 @@ async def transcribe(payload: Base64AudioInput):
                 vad_filter=True,  # Important for segmenting audio
                 # chunk_length=15,  # Process in 15-second chunks
             )
-        except Exception as e:
-            logger.error(f"Error during transcription: {str(e)}")
-            raise HTTPException(
-                status_code=500, detail=f"Transcription error: {str(e)}"
+
+            logger.info(
+                f"[Whisper] Detected language: {info.language} ({info.language_probability:.2f})"
             )
 
-        transcript = []
+            transcript = []
 
-        try:
             for segment in segments:
                 global_start = payload.start_offset + segment.start
                 global_end = payload.start_offset + segment.end
@@ -79,8 +77,10 @@ async def transcribe(payload: Base64AudioInput):
             logger.debug(f"Transcription result: {transcription}")
 
         except Exception as e:
-            logger.error(f"Error during streaming transcription: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Streaming error: {str(e)}")
+            logger.error(f"Error during transcription: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Transcription error: {str(e)}"
+            )
 
         return {"transcription": transcription}
     except Exception as e:

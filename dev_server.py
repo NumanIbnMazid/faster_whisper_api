@@ -8,7 +8,7 @@ load_dotenv()
 def run():
     log_level_env = os.getenv("LOG_LEVEL", "info")
     uvicorn.run(
-        "app.main:app",  # Update to your actual ASGI path
+        "app.asgi:app",  # Update to your actual ASGI path
         host="0.0.0.0",
         port=int(os.getenv("PORT", 7860)),
         reload=True,

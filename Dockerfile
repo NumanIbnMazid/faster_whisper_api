@@ -2,6 +2,27 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Dhaka
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+	build-essential \
+	gcc \
+	redis-server \
+	supervisor \
+	tzdata \
+	ca-certificates \
+	ffmpeg \
+	wget \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
+
+# Set timezone
+RUN ln -fs /usr/share/zoneinfo/Asia/Dhaka /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -16,7 +37,11 @@ COPY --chown=user . $HOME/app
 
 ENV PYTHONPATH=/app
 
-# Make the uvicorn.sh script executable
-RUN chmod +x uvicorn.sh
+# Set up Supervisor
+COPY supervisord.conf /etc/supervisor/supervisord.conf
 
-CMD ["bash", "./uvicorn.sh"]
+# Add the entrypoint script and make it executable
+RUN chmod +x /app/entrypoint.sh
+
+# Entrypoint
+ENTRYPOINT ["bash", "-c", "/app/entrypoint.sh"]

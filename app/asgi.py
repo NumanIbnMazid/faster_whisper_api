@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.transcribe import router as transcribe_router
 from app.routers.websocket import router as websocket_router
