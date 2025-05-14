@@ -9,7 +9,6 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 redis_manager = RedisConnectionManager()
 
-# Ping Interval in seconds
 PING_INTERVAL = 20
 groups: dict[str, set[WebSocket]] = {}
 
