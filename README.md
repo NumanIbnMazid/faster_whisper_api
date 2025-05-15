@@ -1,5 +1,5 @@
 ---
-title: Faster Whisper API
+title: Whisper API for NIM23 APPS
 emoji: 🚀
 colorFrom: indigo
 colorTo: purple
