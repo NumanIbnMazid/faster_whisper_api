@@ -54,6 +54,8 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Dhaka /etc/localtime && dpkg-reconfigure -f 
 
 # Create non-root user
 RUN useradd -m -u 1000 user
+# Switch to non-root user
+USER user
 
 # Copy installed Python packages from builder
 COPY --from=builder /root/.local $HOME/.local
@@ -64,12 +66,12 @@ COPY --chown=user . .
 
 # Supervisor configuration
 COPY supervisord.conf /etc/supervisor/supervisord.conf
+RUN mkdir -p $HOME/app/logs && \
+    touch $HOME/app/logs/supervisord.log && \
+    chown -R user:user $HOME/app
 
 # Make entrypoint executable
 RUN chmod +x $HOME/app/entrypoint.sh
-
-# Switch to non-root user
-USER user
 
 # Entrypoint
 ENTRYPOINT ["bash", "-c", "/home/user/app/entrypoint.sh"]
