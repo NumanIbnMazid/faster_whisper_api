@@ -5,6 +5,7 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Dhaka
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -12,10 +13,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	gcc \
 	redis-server \
 	supervisor \
+	tzdata \
 	ca-certificates \
 	ffmpeg \
+	wget \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
+
+# Set timezone
+RUN ln -fs /usr/share/zoneinfo/Asia/Dhaka /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
